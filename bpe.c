@@ -1,5 +1,20 @@
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
+
+#define STB_DS_IMPLEMENTATION
+#include "stb_ds.h"
+
+typedef struct {
+  char pair[2];
+} Pair;
+
+typedef struct {
+  Pair key;
+  size_t value;
+} KV;
+
+KV *freq = NULL;
 
 int main() {
   const char *text =
@@ -15,9 +30,17 @@ int main() {
   int text_size = strlen(text);
 
   for (int i = 0; i < text_size - 1; ++i) {
-    char a = text[i];
-    char b = text[i + 1];
-    printf("%c%c\n", a, b);
+    Pair pair = {.pair = {text[i], text[i + 1]}};
+    ptrdiff_t i = hmgeti(freq, pair);
+    if (i < 0)
+      hmput(freq, pair, 1);
+    else
+      freq[i].value += 1;
+  }
+
+  for (ptrdiff_t i = 0; i < hmlen(freq) - 1; ++i) {
+    printf("%c%c => %zu\n", freq[i].key.pair[0], freq[i].key.pair[1],
+           freq[i].value);
   }
 
   return 0;
